@@ -53,16 +53,22 @@ async def bot_mesaage(message: types.Message):
 
         else:
             print(db.get_signup(message.from_user.id))
-            if db.get_signup(message.from_user.id) == 'setnickname':
-                if '@' in message.text or "/" in message.text:
-                    await bot.send_message(message.from_user.id, "Taqiqlangan simvol kirittingiz")
-                else:
 
-                    db.set_name(message.from_user.id, message.text)
-                    db.set_signup(message.from_user.id, "done")
-                    await bot.send_message(message.from_user.id, "Registrasiya muvafiqiyatli otti!", reply_markup=nav.mainMenu)
+            if db.get_signup(message.from_user.id) == 'setnickname':
+                db.set_name(message.from_user.id, message.text)
+
+                await bot.send_message(message.from_user.id, "Qwasar useringizni kiriting")
+                db.add_quser(message.from_user.id, message.text)
+                db.set_signup(message.from_user.id, "done")                                     #Shu joyida ishlavomman!!!!
+                await bot.send_message(message.from_user.id, "Registrasiya muvafiqiyatli otti!",
+                                       reply_markup=nav.mainMenu)
+
+
+
             else:
                 await bot.send_message(message.from_user.id, "Nma?")
+
+
 
 
 if __name__ == '__main__':
