@@ -1,5 +1,7 @@
 import sqlite3
 
+from aiogram.dispatcher.filters.state import StatesGroup, State
+
 
 class Database:
     def __init__(self, db_file):
@@ -57,3 +59,12 @@ class Database:
     def set_signup(self, user_id, signup):
         with self.connection:
             return self.cursor.execute("UPDATE persons_data SET signup = ? WHERE user_id = ?", (signup, user_id,))
+
+
+class Registration(StatesGroup):
+    qwasar_user = State()
+    name = State()
+    path = State()
+    phone = State()
+    season = State()
+    stay = State()
