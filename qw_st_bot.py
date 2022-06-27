@@ -7,6 +7,7 @@ from aiogram.dispatcher import FSMContext
 import markups as nav
 from main_s import Database
 from main_s import Registration
+from main_s import Search
 
 API_TOKEN = '5536890192:AAEQgIYCfyJc0UwoCWA6NFRMuObZwlu_ATs'
 
@@ -168,9 +169,22 @@ async def state_path(message: types.Message, state: FSMContext):
         await state.finish()
 
 
-@dp.message_handler(commands=['srchqw'])
+@dp.message_handler()
 async def bot_mesaage(message: types.Message):
-    print('hello')
+    if message.text == "Qwasar user boyicha qidirish":
+        await bot.send_message(message.from_user.id, "Qwasar user yozing")
+        await Search.srch_by_qw.set()
+
+
+@dp.message_handler(state=Search.srch_by_qw)
+async def bot_mesaage(message: types.Message, state: FSMContext):
+    answer = message.text
+    await state.update_data(sqw=answer)
+    data = await state.get_data()
+    srchqw = data.get('sqw')
+    print(db.serch_by_qw(srchqw))
+    # print(srchqw)
+    await state.finish()
 
 
 if __name__ == '__main__':
