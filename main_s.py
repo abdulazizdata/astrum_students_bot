@@ -60,6 +60,11 @@ class Database:
         with self.connection:
             return self.cursor.execute("UPDATE persons_data SET signup = ? WHERE user_id = ?", (signup, user_id,))
 
+    def serch_by_qw(self, srchq):
+        with self.connection:
+            return self.cursor.execute("SELECT * FROM persons_data WHERE q_user = ?", (srchq,)).fetchall()
+            # return self.cursor.execute("SELECT * FROM persons_data WHERE q_user = 'yusupov_f'").fetchall()
+
 
 class Registration(StatesGroup):
     qwasar_user = State()
@@ -68,3 +73,7 @@ class Registration(StatesGroup):
     phone = State()
     season = State()
     stay = State()
+
+
+class Search(StatesGroup):
+    srch_by_qw = State()
