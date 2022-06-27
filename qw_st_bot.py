@@ -117,7 +117,7 @@ async def state_phone(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(state=Registration.season)
-async def state_phone(message: types.Message, state: FSMContext):
+async def state_season(message: types.Message, state: FSMContext):
     answer = message.text
 
     await state.update_data(season=answer)
@@ -126,7 +126,7 @@ async def state_phone(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(state=Registration.stay)
-async def state_phone(message: types.Message, state: FSMContext):
+async def state_stay(message: types.Message, state: FSMContext):
     answer = message.text
 
     await state.update_data(stay=answer)
@@ -134,32 +134,13 @@ async def state_phone(message: types.Message, state: FSMContext):
     await Registration.path.set()
 
 
-@dp.message_handler(state=Registration.path)
-async def state_season(message: types.Message, state: FSMContext):
-    # answer = message.text
-    # await state.update_data(path=answer)
-    # data = await state.get_data()
-    # name = data.get('name')
-    # q_user = data.get('qwasar_user')
-    # phone = data.get('phone')
-    # season = data.get('season')
-    # stay = data.get('stay')
-    # path = data.get('path')
-    # print(name)
-    # print(q_user)
-    # print(phone)
-    # print(season)
-    # print(stay)
-    # print(path)
-    # db.set_name(message.from_user.id, name)
-    # db.add_quser(message.from_user.id, q_user)
-    # db.set_phone_number(message.from_user.id, phone)
-    # db.set_season(message.from_user.id, season)
-    # db.set_stay(message.from_user.id, stay)
-    # db.set_path(message.from_user.id, path)
-
+@dp.message_handler(state=Registration.path, content_types=['photo'])
+async def state_path(message: types.Message, state: FSMContext):
     if db.get_signup(message.from_user.id) == 'setnickname':
         answer = message.text
+        await message.photo[-1].download('/Users/student/PycharmProjects/Face_bot/image_known')
+        file_photo = await bot.get_file(message.photo[-1].file_id)
+
         await state.update_data(path=answer)
         data = await state.get_data()
         name = data.get('name')
@@ -167,7 +148,7 @@ async def state_season(message: types.Message, state: FSMContext):
         phone = data.get('phone')
         season = data.get('season')
         stay = data.get('stay')
-        path = data.get('path')
+        path = file_photo['file_path']
         print(name)
         print(q_user)
         print(phone)
@@ -181,13 +162,15 @@ async def state_season(message: types.Message, state: FSMContext):
         db.set_stay(message.from_user.id, stay)
         db.set_path(message.from_user.id, path)
 
-        db.set_signup(message.from_user.id, "done")  # Shu joyida ishlavomman!!!!
+        db.set_signup(message.from_user.id, "done")
         await bot.send_message(message.from_user.id, "Registrasiya muvafiqiyatli otti!",
                                reply_markup=nav.mainMenu)
         await state.finish()
 
-    # await bot.send_message(message.from_user.id, "Registrasiya muvafiqiyatli otti!", reply_markup=nav.mainMenu)
-    # await state.finish()
+
+@dp.message_handler(commands=['srchqw'])
+async def bot_mesaage(message: types.Message):
+    print('hello')
 
 
 if __name__ == '__main__':
