@@ -101,7 +101,7 @@ async def state_name(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=Registration.qwasar_user)
 async def state_qwname(message: types.Message, state: FSMContext):
-    answer = message.text
+    answer = message.text.lower()
 
     await state.update_data(qwasar_user=answer)
     await bot.send_message(message.from_user.id, "Telefon nomeringizni kiriting")
@@ -156,17 +156,20 @@ async def state_path(message: types.Message, state: FSMContext):
         print(season)
         print(stay)
         print(path)
-        db.set_name(message.from_user.id, name)
-        db.add_quser(message.from_user.id, q_user)
-        db.set_phone_number(message.from_user.id, phone)
-        db.set_season(message.from_user.id, season)
-        db.set_stay(message.from_user.id, stay)
-        db.set_path(message.from_user.id, path)
+        try:
+            db.set_name(message.from_user.id, name)
+            db.add_quser(message.from_user.id, q_user)
+            db.set_phone_number(message.from_user.id, phone)
+            db.set_season(message.from_user.id, season)
+            db.set_stay(message.from_user.id, stay)
+            db.set_path(message.from_user.id, path)
 
-        db.set_signup(message.from_user.id, "done")
-        await bot.send_message(message.from_user.id, "Registrasiya muvafiqiyatli otti!",
-                               reply_markup=nav.mainMenu)
-        await state.finish()
+            db.set_signup(message.from_user.id, "done")
+            await bot.send_message(message.from_user.id, "Registrasiya muvafiqiyatli otti!", reply_markup=nav.mainMenu)
+            await state.finish()
+        except:
+            db.del_data(message.from_user.id)
+            await bot.send_message(message.from_user.id, "Bu Qwasar username registrasiyadan o'tgan")
 
 
 @dp.message_handler()
@@ -174,6 +177,9 @@ async def bot_mesaage(message: types.Message):
     if message.text == "Qwasar user boyicha qidirish":
         await bot.send_message(message.from_user.id, "Qwasar user yozing")
         await Search.srch_by_qw.set()
+    if message.text == "Rasm bo'yicha qidirish":
+        await bot.send_message(message.from_user.id, "Rasm tashlang")
+        await Search.srch_by_ph.set()
 
 
 @dp.message_handler(state=Search.srch_by_qw)
@@ -182,8 +188,34 @@ async def bot_mesaage(message: types.Message, state: FSMContext):
     await state.update_data(sqw=answer)
     data = await state.get_data()
     srchqw = data.get('sqw')
-    print(db.serch_by_qw(srchqw))
-    # print(srchqw)
+    # print(db.serch_by_qw(srchqw)[3])
+    try:
+
+        name = db.serch_by_qw(srchqw)[2]
+        q_user = db.serch_by_qw(srchqw)[1]
+        photo = open("image_known/" + db.serch_by_qw(srchqw)[3], "rb")
+        t_user = db.serch_by_qw(srchqw)[4]
+        phone = db.serch_by_qw(srchqw)[5]
+        season = db.serch_by_qw(srchqw)[6]
+        stay = db.serch_by_qw(srchqw)[7]
+
+        await bot.send_photo(message.from_user.id, photo,
+                             f"Ismi: {name}\nTelegram user name: @{t_user}\nTelefon raqami: {phone}\nSeason: {season}\nOtiradigan xonasi: {stay}")
+
+    except:
+
+        await bot.send_message(message.from_user.id, "Bu odam registrasiyadan o'tmagan")
+
+    await state.finish()
+
+
+@dp.message_handler(state=Search.srch_by_ph)
+async def bot_srch(message: types.Message, state: FSMContext):
+    answer = message.text
+    await state.update_data(sqwph=answer)
+    data = await state.get_data()
+    sqwph = data.get('sqwph')
+    print(sqwph)
     await state.finish()
 
 
