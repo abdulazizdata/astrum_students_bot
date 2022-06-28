@@ -23,6 +23,7 @@ db = Database('data.db')
 
 admin_id = '1784921501'  # Abdulaziz
 admin_id_1 = "5161784802"  # Abubakr
+admin_id_2 = "1758418110" # Firdavs
 
 # @dp.message_handler(commands=['start', 'help'])
 # async def send_to_admin(message: types.Message):
@@ -84,7 +85,8 @@ async def register(message: types.Message):
     if not db.user_exists(message.from_user.id):
         db.add_user(message.from_user.id)
         db.set_t_user(message.from_user.id, message.from_user.username)
-        await bot.send_message(message.from_user.id, "Siz Registrasiyani boshladingiz\nOtingizni kiriting")
+        await bot.send_message(message.from_user.id, "Siz Registrasiyani boshladingiz")
+        await bot.send_message(message.from_user.id, "Ismizni kiriting")
         await Registration.name.set()
     else:
         await bot.send_message(message.from_user.id, "Siz registrasiyadan otib bolgansiz!", reply_markup=nav.mainMenu)
