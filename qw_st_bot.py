@@ -4,8 +4,8 @@ import logging
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 
-import os
 import face_recognition
+import glob, os, os.path
 
 import markups as nav
 from main_s import Database
@@ -252,6 +252,10 @@ async def bot_srch(message: types.Message, state: FSMContext):
                 stay = db.serch_by_ph("photos/"+a[i])[7]
                 print(name)
                 await bot.send_message(message.from_user.id, f"Ismi: {name}\nTelegram user name: @{t_user}\nTelefon raqami: {phone}\nSeason: {season}\nOtiradigan xonasi: {stay}")
+                mydir = "/Users/student/PycharmProjects/Face_bot/image_unknown/photos"
+                filelist = glob.glob(os.path.join(mydir, "*.jpg"))
+                for f in filelist:
+                    os.remove(f)
                 break
         except:
             await bot.send_message(message.from_user.id, "Bu odam registrasiyadan o'tmagan, yoki yuborgan rasimingiz tiniq emas(yuz qismi toliq korinishi kerak)")
