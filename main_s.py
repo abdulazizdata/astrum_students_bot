@@ -63,6 +63,23 @@ class Database:
     def del_data(self, user_id):
         with self.connection:
             return self.cursor.execute("DELETE FROM persons_data WHERE user_id = ?", (user_id,))
+    def serch_by_ph(self, path):
+        with self.connection:
+            result = self.cursor.execute("SELECT * FROM persons_data WHERE path = ?", (path,)).fetchall()
+            res = []
+            for row in result:
+                # val = str(row[2:])
+                res.append(row[0])
+                res.append(row[1])
+                res.append(row[2])
+                res.append(row[3])
+                res.append(row[4])
+                res.append(row[5])
+                res.append(row[6])
+                res.append(row[7])
+                res.append(row[8])
+
+            return res
 
     def serch_by_qw(self, srchq):
         with self.connection:

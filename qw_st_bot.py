@@ -4,12 +4,15 @@ import logging
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 
+import os
+import face_recognition
+
 import markups as nav
 from main_s import Database
 from main_s import Registration
 from main_s import Search
 
-API_TOKEN = '5536890192:AAEQgIYCfyJc0UwoCWA6NFRMuObZwlu_ATs'
+API_TOKEN = '5466643678:AAH9fnTyC0CAwSktV3tZUgalUam006vPfCs'
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -179,6 +182,7 @@ async def bot_mesaage(message: types.Message):
         await Search.srch_by_qw.set()
     if message.text == "Rasm bo'yicha qidirish":
         await bot.send_message(message.from_user.id, "Rasm tashlang")
+
         await Search.srch_by_ph.set()
 
 
@@ -209,13 +213,62 @@ async def bot_mesaage(message: types.Message, state: FSMContext):
     await state.finish()
 
 
-@dp.message_handler(state=Search.srch_by_ph)
+@dp.message_handler(state=Search.srch_by_ph, content_types=['photo'])
 async def bot_srch(message: types.Message, state: FSMContext):
     answer = message.text
     await state.update_data(sqwph=answer)
     data = await state.get_data()
-    sqwph = data.get('sqwph')
-    print(sqwph)
+    await message.photo[-1].download('/Users/student/PycharmProjects/Face_bot/image_unknown')
+    file_photo = await bot.get_file(message.photo[-1].file_id)
+    path  = file_photo['file_path']
+    print(path)
+    # sqwph = data.get('sqwph')
+    print(file_photo)
+
+    # get the path/directory
+    folder_dir = "/Users/student/PycharmProjects/Face_bot/image_known/photos"
+    a = []
+    for images in os.listdir(folder_dir):
+        a.append(images)
+
+    for i in range(len(a)):
+        try:
+
+            known = face_recognition.load_image_file("image_known/photos/"+a[i])
+            unknown = face_recognition.load_image_file("image_unknown/"+path)
+            image_2_en = face_recognition.face_encodings(unknown)[0]
+            image_1_en = face_recognition.face_encodings(known)[0]
+
+            res = face_recognition.compare_faces([image_2_en], image_1_en, tolerance=0.5)
+
+            if res == [True]:
+                print("This is Abdulaziz")
+                name = db.serch_by_ph("photos/"+a[i])[2]
+                q_user = db.serch_by_ph("photos/"+a[i])[1]
+                photo = db.serch_by_ph("photos/"+a[i])[3]
+                t_user = db.serch_by_ph("photos/"+a[i])[4]
+                phone = db.serch_by_ph("photos/"+a[i])[5]
+                season = db.serch_by_ph("photos/"+a[i])[6]
+                stay = db.serch_by_ph("photos/"+a[i])[7]
+                print(name)
+                await bot.send_message(message.from_user.id, f"Ismi: {name}\nTelegram user name: @{t_user}\nTelefon raqami: {phone}\nSeason: {season}\nOtiradigan xonasi: {stay}")
+                break
+        except:
+            await bot.send_message(message.from_user.id, "Bu odam registrasiyadan o'tmagan, yoki yuborgan rasimingiz tiniq emas(yuz qismi toliq korinishi kerak)")
+            break
+
+
+
+
+
+
+
+        # print(res)
+
+
+        # print(a[i])
+
+
     await state.finish()
 
 
